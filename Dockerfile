@@ -1,21 +1,16 @@
-FROM python:3.6-alpine
+FROM python:3.9-slim
 
-ENV FLASK_APP flasky.py
-ENV FLASK_CONFIG production
+WORKDIR /app
 
-RUN adduser -D flasky
-USER flasky
+# Copy entire application into the container
+COPY . /app
 
-WORKDIR /home/flasky
+# Install required Python packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY requirements requirements
-RUN python -m venv venv
-RUN venv/bin/pip install -r requirements/docker.txt
+ENV FLASK_APP=hello.py
 
-COPY app app
-COPY migrations migrations
-COPY flasky.py config.py boot.sh ./
-
-# run-time configuration
 EXPOSE 5000
-ENTRYPOINT ["./boot.sh"]
+
+# Command to run the application
+CMD ["flask", "run", "--host=0.0.0.0"]
